@@ -27,13 +27,25 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            position:relative;
         }
 
-        input[type="text"] {
+        input {
             width: 200px;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            display: block; /* Hacer que el input ocupe toda la anchura del contenedor */
+            margin: 0 auto; /* Centrar el input dentro del contenedor */
+        }
+
+        label {
+            position: absolute;
+            top: -25px; /* Ajustar la posicion del texto encima del input*/
+            left: 5px; /* Ajustar la posición del texto alineado a la izquierda */
+            text-align: left; /* Centrar el texto horizontalmente */
+            color: #666; /* Color de texto gris para indicar que es una descripción */
+            pointer-events: none; /* Evitar que el label sea clickeable */
         }
 
         #result {
@@ -43,19 +55,71 @@
             border-radius: 5px;
             background-color: #fff;
         }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
     </style>
+
 </head>
 <body>
     <main class="container">
         <section class="box">
-            <input type="text" placeholder="Año">
+            <label for="yearInput">Año</label>
+            <input type="number" placeholder="año" min="1900" max="2100" step="1" id="yearInput">
         </section>
         <section class="box">
-            <input type="text" placeholder="Escribe aquí">
+            <label for="fecha">Fecha</label>
+            <input id="fecha" type="date" placeholder="Escribe aquí">
         </section>
         <section class="box">
             <div id="result">Resultado</div>
         </section>
+        <button onclick="calcular()">Calcular</button>
     </main>
+
+    <script>
+        const yearPlaceholder = new Date().getFullYear() + 1;
+        document.getElementById('yearInput').placeholder = `Ejemplo: ${yearPlaceholder}`;
+        function calcular() {
+
+            const fechaInput = document.getElementById('fecha').value;
+            const result = document.getElementById('result');
+
+            if (!fechaInput) {
+                result.textContent = 'Por favor, elige una fecha.';
+                return;
+            }
+
+            const fechaSeleccionada = new Date(fechaInput);
+            const fechaActual = new Date();
+
+            const diferenciaMilisegundos = fechaSeleccionada - fechaActual;
+            const minutos = Math.floor(diferenciaMilisegundos / (1000 * 60));
+            const dias = Math.floor(minutos / (24 * 60));
+
+            if (minutos < 0) {
+                result.textContent = 'La fecha seleccionada ya ha pasado.';
+            } else {
+                const dias = Math.floor(minutos / (24 * 60));
+                const minutosRestantes = minutos % (24 * 60);
+                const minutosAcumulados = dias * 20;
+
+                result.textContent = `Faltan ${dias} días y ${minutosRestantes} minutos. ${minutosAcumulados} minutos acumulados.`;
+            }
+        }
+    </script>
+
 </body>
 </html>
