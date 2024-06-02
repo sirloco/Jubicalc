@@ -45,6 +45,26 @@
             text-align: center;
         }
 
+        .acum-table {
+            grid-column: 5;
+            grid-row: 1 / 5;
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .can-table {
+            grid-column: 6;
+            grid-row: 1 / 5;
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
         .box {
             display: flex;
             background-color: #f0f0f0;
@@ -115,9 +135,10 @@
 </head>
 <body>
     <main class="container">
-
+        
         <section class="coef-table">
             <table>
+                <caption>Tabla de Coeficientes</caption>
                 <thead>
                     <tr>
                         <th>Meses</th>
@@ -130,17 +151,47 @@
             </table>
         </section>
 
-        <section class="box input-container">
-            <label for="yearInput">Años Trabajados</label>
-            <input type="number" placeholder="Ejemplo: 15" min="1" max="100" step="1" id="yearInput">
-        </section>
-        
         <section class="box">
             <label for="mesesAdelanto">Meses de adelanto</label>
             <input id="mesesAdelanto" type="number" min="1" max="24" placeholder="Entre 1 y 24">
         </section>
         
+        <section class="box input-container">
+            <label for="yearInput">Años Trabajados</label>
+            <input type="number" placeholder="Ejemplo: 15" min="1" max="100" step="1" id="yearInput">
+        </section>
+        
         <button onclick="calcular()">Calcular</button>
+
+        <section class="acum-table">
+            <table>
+                <caption>Días Acumulados</caption>
+                <thead>
+                    <tr>
+                        <th>Años</th>
+                        <th>Dias</th>
+                    </tr>
+                </thead>
+                <tbody id="acumTableBody">
+                    <!-- Aquí se insertarán las filas de la tabla mediante JavaScript -->
+                </tbody>
+            </table>
+        </section>
+
+        <section class="can-table">
+            <table>
+                <caption>Dias canosos</caption>
+                <thead>
+                    <tr>
+                        <th>Años</th>
+                        <th>Dias</th>
+                    </tr>
+                </thead>
+                <tbody id="canTableBody">
+                    <!-- Aquí se insertarán las filas de la tabla mediante JavaScript -->
+                </tbody>
+            </table>
+        </section>
 
         <section class="box result-container">
             <textarea id="result" rows="10" readonly>Resultado</textarea>
@@ -212,17 +263,62 @@
             });
         }
 
+        function loadAcumTable() {
+            const acumTableBody = document.getElementById('acumTableBody');
+            diasAcumulados.forEach((months, days) => {
+                const row = document.createElement('tr');
+                const cell1 = document.createElement('td');
+                const cell2 = document.createElement('td');
+                cell1.textContent = days;
+                cell2.textContent = months;
+                row.appendChild(cell1);
+                row.appendChild(cell2);
+                acumTableBody.appendChild(row);
+            });
+        }
+
+        function loadCanTable() {
+            const canTableBody = document.getElementById('canTableBody');
+            diasCanosos.forEach((months, days) => {
+                const row = document.createElement('tr');
+                const cell1 = document.createElement('td');
+                const cell2 = document.createElement('td');
+                cell1.textContent = days;
+                cell2.textContent = months;
+                row.appendChild(cell1);
+                row.appendChild(cell2);
+                canTableBody.appendChild(row);
+            });
+        }
+
         function calcular() {
 
-            const serviciosPrestados = document.getElementById('yearInput').value;
-            
             const mesesInput = parseInt(document.getElementById('mesesAdelanto').value);
+            const serviciosPrestados = document.getElementById('yearInput').value;            
             const result = document.getElementById('result');
 
-            if (!mesesInput) {
-                result.textContent = 'Por favor, pon cuatos meses quieres adelantar.';
+            let error = "";
+            /** Validacion campo meses vacio */
+            if (!mesesInput) error += "Indica cuatos meses quieres adelantar.\n"; 
+            /** Validacion campo meses es un numero */
+            if(isNaN(mesesInput)) error += "En los meses debe introducir caracteres numéricos.\n";
+            /** Validacion campo meses mayor que 1 */
+            if(mesesInput < 1) error += "En los meses debe haber un valor superior a 1.\n";
+            /** Validacion campo meses menor que 24 */
+            if(mesesInput > 24) error += "En los meses debe haber un valor inferior a 24.\n";
+            /** Validacion campo años vacio */
+            if(!serviciosPrestados) error += "Indica cuantos años has trabajado.\n";
+            /** Validacion campo años es un numero */
+            if(isNaN(serviciosPrestados)) error += "En los meses debe introducir caracteres numéricos.\n";
+            /** Validacion campo años mayor que 1 */
+            if(serviciosPrestados < 1) error += "En los años debe haber un valor superior a 1." 
+            
+            if(error){
+                result.textContent = error;
                 return;
             }
+
+
             const min = 30;
             const jornadasMes = 212 / 12;
             
@@ -288,6 +384,8 @@ TOTAL ${diasPorAnticipacion} + ${diasPorServicios} + ${diasPorCanosos} = ${diasT
         }
 
         document.addEventListener('DOMContentLoaded', loadCoefTable);
+        document.addEventListener('DOMContentLoaded', loadAcumTable);
+        document.addEventListener('DOMContentLoaded', loadCanTable);
 
     </script>
 
